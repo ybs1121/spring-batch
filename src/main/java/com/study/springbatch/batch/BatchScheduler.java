@@ -2,6 +2,7 @@ package com.study.springbatch.batch;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -26,13 +27,13 @@ public class BatchScheduler {
 
 
     @Bean
-    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(){
+    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() {
         JobRegistryBeanPostProcessor jobProcessor = new JobRegistryBeanPostProcessor();
         jobProcessor.setJobRegistry(jobRegistry);
         return jobProcessor;
     }
 
-    @Scheduled(cron = "0/10 * * * * *") // 10초마다 실행
+    @Scheduled(cron = "0/60 * * * * *") // 10초마다 실행
     public void runJob() {
         String time = LocalDateTime.now().toString();
         try {
@@ -49,4 +50,24 @@ public class BatchScheduler {
             throw new RuntimeException(e);
         }
     }
+
+
+    @Scheduled(cron = "0/5 * * * * *") // 5초마다 실행
+    public void runJob2() {
+        try {
+            Job job = jobRegistry.getJob("personJob");
+            jobLauncher.run(job, new JobParameters());
+        } catch (NoSuchJobException e) {
+            throw new RuntimeException(e);
+        } catch (JobInstanceAlreadyCompleteException e) {
+            throw new RuntimeException(e);
+        } catch (JobExecutionAlreadyRunningException e) {
+            throw new RuntimeException(e);
+        } catch (JobParametersInvalidException e) {
+            throw new RuntimeException(e);
+        } catch (JobRestartException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
