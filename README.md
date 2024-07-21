@@ -77,3 +77,38 @@ Writer Tasklet
 Writer가 데이터를 저장하는 단일 작업을 나타냅니다.
 예를 들어 변환된 데이터를 DB에 Insert하는 작업이 Writer Tasklet에 해당합니다.
 ````
+
+포멧이 동일할 때 
+```` java
+@Bean
+@Qualifier("uppercaseProcessor")
+public ItemProcessor<Person, Person> uppercaseProcessor() {
+    return person -> {
+        person.setName(person.getName().toUpperCase());
+        return person;
+    };
+}
+
+@Bean
+@Qualifier("lowercaseProcessor")
+public ItemProcessor<Person, Person> lowercaseProcessor() {
+    return person -> {
+        person.setName(person.getName().toLowerCase());
+        return person;
+    };
+}
+
+
+@Bean
+public Job job(JobBuilderFactory jobBuilderFactory,
+               StepBuilderFactory stepBuilderFactory,
+               @Qualifier("uppercaseProcessor") ItemProcessor<Person, Person> itemProcessor,
+               ItemWriter<Person> itemWriter) {
+    return jobBuilderFactory.get("personJob")
+            .start(step(stepBuilderFactory, itemProcessor, itemWriter))
+            .build();
+}
+
+
+````
+
