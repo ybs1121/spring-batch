@@ -57,6 +57,11 @@ public class BatchScheduler {
         try {
             Job job = jobRegistry.getJob("personJob");
             jobLauncher.run(job, new JobParameters());
+            /*
+            * JobParameters가 필요하지만, 값이 없어도 되는 경우 빈 JobParameters를 전달할 수 있습니다.
+            *  빈 JobParameters를 전달하면 Job은 실행되지만, RunIdIncrementer와 같은 설정이 없으면 동일한 파라미터로
+            *  다시 실행되지 않습니다.
+            * */
         } catch (NoSuchJobException e) {
             throw new RuntimeException(e);
         } catch (JobInstanceAlreadyCompleteException e) {
