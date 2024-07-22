@@ -1,6 +1,7 @@
 package com.study.springbatch.batch;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class BatchScheduler {
 
     private final JobRegistry jobRegistry;
@@ -33,7 +35,19 @@ public class BatchScheduler {
         return jobProcessor;
     }
 
-    @Scheduled(cron = "0/60 * * * * *") // 10초마다 실행
+    @Scheduled(cron = "0/10 * * * * *")
+    private void runNaverDataLab() {
+        String time = LocalDateTime.now().toString();
+        try {
+            Job job = jobRegistry.getJob("naverDataLabJob"); // job 이름
+            JobParametersBuilder jobParam = new JobParametersBuilder().addString("time", time);
+            jobLauncher.run(job, jobParam.toJobParameters());
+        } catch (Exception e) {
+            log.info("e : {} ", e);
+        }
+    }
+
+//    @Scheduled(cron = "0/60 * * * * *") // 10초마다 실행
     public void runJob() {
         String time = LocalDateTime.now().toString();
         try {
@@ -52,16 +66,16 @@ public class BatchScheduler {
     }
 
 
-    @Scheduled(cron = "0/5 * * * * *") // 5초마다 실행
+//    @Scheduled(cron = "0/5 * * * * *") // 5초마다 실행
     public void runJob2() {
         try {
             Job job = jobRegistry.getJob("personJob");
             jobLauncher.run(job, new JobParameters());
             /*
-            * JobParameters가 필요하지만, 값이 없어도 되는 경우 빈 JobParameters를 전달할 수 있습니다.
-            *  빈 JobParameters를 전달하면 Job은 실행되지만, RunIdIncrementer와 같은 설정이 없으면 동일한 파라미터로
-            *  다시 실행되지 않습니다.
-            * */
+             * JobParameters가 필요하지만, 값이 없어도 되는 경우 빈 JobParameters를 전달할 수 있습니다.
+             *  빈 JobParameters를 전달하면 Job은 실행되지만, RunIdIncrementer와 같은 설정이 없으면 동일한 파라미터로
+             *  다시 실행되지 않습니다.
+             * */
         } catch (NoSuchJobException e) {
             throw new RuntimeException(e);
         } catch (JobInstanceAlreadyCompleteException e) {

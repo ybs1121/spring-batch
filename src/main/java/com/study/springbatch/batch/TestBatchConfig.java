@@ -19,7 +19,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-public class BatchConfig extends DefaultBatchConfiguration {
+public class TestBatchConfig extends DefaultBatchConfiguration {
 
     @Bean
     public Job testJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) throws DuplicateJobException {
